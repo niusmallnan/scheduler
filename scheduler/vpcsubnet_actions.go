@@ -108,14 +108,3 @@ func (v *VpcSubnetReserveAction) Reserve(scheduler *Scheduler, requests []Resour
 
 func (v *VpcSubnetReserveAction) RollBack(scheduler *Scheduler, requests []ResourceRequest, context Context, host *host) {
 }
-
-func removeDuplicates(in []string) (out []string) {
-	m := map[string]bool{}
-	for _, v := range in {
-		if _, found := m[v]; !found {
-			out = append(out, v)
-			m[v] = true
-		}
-	}
-	return out
-}

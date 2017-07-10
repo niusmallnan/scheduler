@@ -84,7 +84,7 @@ func (w *metadataWatcher) updateFromMetadata(mdVersion string) {
 		if !ok {
 			continue
 		}
-		currentHostDeploymentsMap[c.HostUUID] = append(currentHostDeploymentsMap[c.HostUUID], dm)
+		currentHostDeploymentsMap[c.HostUUID] = removeDuplicates(append(currentHostDeploymentsMap[c.HostUUID], dm))
 	}
 
 	for _, h := range hosts {
@@ -153,13 +153,13 @@ func (w *metadataWatcher) updateFromMetadata(mdVersion string) {
 				w.resourceUpdater.CreateResourcePool(h.UUID, duPool)
 			}
 
-			duPool := &scheduler.DeploymentUnitPool{
+			curDuPool := &scheduler.DeploymentUnitPool{
 				Resource:    currentDeploymentUnitPool,
 				Deployments: currentHostDeploymentsMap[h.UUID],
 			}
-			poolDoesntExist = !w.resourceUpdater.UpdateResourcePool(h.UUID, duPool)
+			poolDoesntExist = !w.resourceUpdater.UpdateResourcePool(h.UUID, curDuPool)
 			if poolDoesntExist {
-				w.resourceUpdater.CreateResourcePool(h.UUID, duPool)
+				w.resourceUpdater.CreateResourcePool(h.UUID, curDuPool)
 			}
 		}
 	}
