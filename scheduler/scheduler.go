@@ -247,6 +247,20 @@ func (s *Scheduler) UpdateWithMetadata(force bool) (bool, error) {
 			return false, err
 		}
 
+		containers, err := s.mdClient.GetContainers()
+		if err != nil {
+			return false, err
+		}
+
+		currentHostDeploymentsMap := map[string][]string{}
+		for _, c := range containers {
+			dm, ok := c.Labels[deploymentUnitLabel]
+			if !ok {
+				continue
+			}
+			currentHostDeploymentsMap[c.HostUUID] = removeDuplicates(append(currentHostDeploymentsMap[c.HostUUID], dm))
+		}
+
 		usedResourcesByHost, err := GetUsedResourcesByHost(s.mdClient)
 		if err != nil {
 			return false, err
@@ -297,6 +311,15 @@ func (s *Scheduler) UpdateWithMetadata(force bool) (bool, error) {
 			poolDoesntExist = !s.UpdateResourcePool(h.UUID, labelPool)
 			if poolDoesntExist {
 				s.CreateResourcePool(h.UUID, labelPool)
+			}
+
+			curDuPool := &DeploymentUnitPool{
+				Resource:    currentDeploymentUnitPool,
+				Deployments: currentHostDeploymentsMap[h.UUID],
+			}
+			poolDoesntExist = !s.UpdateResourcePool(h.UUID, curDuPool)
+			if poolDoesntExist {
+				s.CreateResourcePool(h.UUID, curDuPool)
 			}
 
 		}

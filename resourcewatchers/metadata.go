@@ -35,18 +35,16 @@ type metadataWatcher struct {
 }
 
 const (
-	instancePool              string = "instanceReservation"
-	memoryPool                string = "memoryReservation"
-	cpuPool                   string = "cpuReservation"
-	storageSize               string = "storageSize"
-	totalAvailableInstances   int64  = 1000000
-	hostLabels                string = "hostLabels"
-	ipLabel                   string = "io.rancher.scheduler.ips"
-	schedulerUpdate           string = "scheduler.update"
-	tempDeploymentUnitPool    string = "tempDeploymentUnitPool"
-	currentDeploymentUnitPool string = "currentDeploymentUnitPool"
-	vpcSubnetLabel            string = "io.rancher.vpc.subnet"
-	deploymentUnitLabel       string = "io.rancher.service.deployment.unit"
+	instancePool            string = "instanceReservation"
+	memoryPool              string = "memoryReservation"
+	cpuPool                 string = "cpuReservation"
+	storageSize             string = "storageSize"
+	totalAvailableInstances int64  = 1000000
+	hostLabels              string = "hostLabels"
+	ipLabel                 string = "io.rancher.scheduler.ips"
+	schedulerUpdate         string = "scheduler.update"
+	tempDeploymentUnitPool  string = "tempDeploymentUnitPool"
+	vpcSubnetLabel          string = "io.rancher.vpc.subnet"
 )
 
 func (w *metadataWatcher) updateFromMetadata(mdVersion string) {
@@ -71,20 +69,6 @@ func (w *metadataWatcher) updateFromMetadata(mdVersion string) {
 	dif := w.resourceUpdater.CompareHostLabels(hosts)
 	if dif {
 		shouldSend = true
-	}
-
-	containers, err := w.client.GetContainers()
-	if err != nil {
-		w.checkError(err)
-	}
-
-	currentHostDeploymentsMap := map[string][]string{}
-	for _, c := range containers {
-		dm, ok := c.Labels[deploymentUnitLabel]
-		if !ok {
-			continue
-		}
-		currentHostDeploymentsMap[c.HostUUID] = scheduler.RemoveDuplicates(append(currentHostDeploymentsMap[c.HostUUID], dm))
 	}
 
 	for _, h := range hosts {
@@ -151,15 +135,6 @@ func (w *metadataWatcher) updateFromMetadata(mdVersion string) {
 					Deployments: []string{},
 				}
 				w.resourceUpdater.CreateResourcePool(h.UUID, duPool)
-			}
-
-			curDuPool := &scheduler.DeploymentUnitPool{
-				Resource:    currentDeploymentUnitPool,
-				Deployments: currentHostDeploymentsMap[h.UUID],
-			}
-			poolDoesntExist = !w.resourceUpdater.UpdateResourcePool(h.UUID, curDuPool)
-			if poolDoesntExist {
-				w.resourceUpdater.CreateResourcePool(h.UUID, curDuPool)
 			}
 		}
 	}

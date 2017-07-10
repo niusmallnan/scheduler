@@ -6,6 +6,7 @@ import (
 
 const (
 	vpcSubnetLabel            = "io.rancher.vpc.subnet"
+	deploymentUnitLabel       = "io.rancher.service.deployment.unit"
 	tempDeploymentUnitPool    = "tempDeploymentUnitPool"
 	currentDeploymentUnitPool = "currentDeploymentUnitPool"
 )
@@ -69,7 +70,7 @@ func (v VpcSubnetReleaseAction) Release(scheduler *Scheduler, requests []Resourc
 		pool := dPool.(*DeploymentUnitPool)
 		for _, cont := range context {
 			deployments := append(pool.Deployments, cont.DeploymentUnitUUID)
-			deployments = RemoveDuplicates(deployments)
+			deployments = removeDuplicates(deployments)
 			pool.Deployments = deployments
 		}
 		logrus.Debugf("Host:%s DeploymentUnitPool: %v", host.id, scheduler.hosts[host.id].pools[tempDeploymentUnitPool])
