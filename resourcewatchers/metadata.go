@@ -84,7 +84,7 @@ func (w *metadataWatcher) updateFromMetadata(mdVersion string) {
 		if !ok {
 			continue
 		}
-		currentHostDeploymentsMap[c.HostUUID] = removeDuplicates(append(currentHostDeploymentsMap[c.HostUUID], dm))
+		currentHostDeploymentsMap[c.HostUUID] = scheduler.RemoveDuplicates(append(currentHostDeploymentsMap[c.HostUUID], dm))
 	}
 
 	for _, h := range hosts {

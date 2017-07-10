@@ -69,7 +69,7 @@ func (v VpcSubnetReleaseAction) Release(scheduler *Scheduler, requests []Resourc
 		pool := dPool.(*DeploymentUnitPool)
 		for _, cont := range context {
 			deployments := append(pool.Deployments, cont.DeploymentUnitUUID)
-			deployments = removeDuplicates(deployments)
+			deployments = RemoveDuplicates(deployments)
 			pool.Deployments = deployments
 		}
 		logrus.Debugf("Host:%s DeploymentUnitPool: %v", host.id, scheduler.hosts[host.id].pools[tempDeploymentUnitPool])

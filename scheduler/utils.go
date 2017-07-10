@@ -105,7 +105,7 @@ func GetUsedResourcesByHost(client metadata.Client) (map[string]map[string]int64
 	return resourcesByHost, nil
 }
 
-func removeDuplicates(in []string) (out []string) {
+func RemoveDuplicates(in []string) (out []string) {
 	m := map[string]bool{}
 	for _, v := range in {
 		if _, found := m[v]; !found {
