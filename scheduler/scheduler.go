@@ -346,8 +346,8 @@ func (s *Scheduler) SetMetadataClient(client metadata.Client) {
 	s.mdClient = client
 }
 
-func (s *Scheduler) SetAPIClient(client *client.RancherClient) {
-	s.rclient = client
+func (s *Scheduler) SetAPIClient(apiClient *client.RancherClient) {
+	s.rclient = apiClient
 }
 
 func (s *Scheduler) getContainerIPByAPI(deploymentUnitUUID string) (string, error) {

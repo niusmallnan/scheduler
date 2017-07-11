@@ -15,7 +15,7 @@ type ResourceUpdater interface {
 	UpdateWithMetadata(force bool) (bool, error)
 	GetMetadataClient() metadata.Client
 	SetMetadataClient(client metadata.Client)
-	SetAPIClient(client *client.RancherClient)
+	SetAPIClient(apiClient *client.RancherClient)
 }
 
 type ResourceRequest interface {
