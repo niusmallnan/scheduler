@@ -176,6 +176,7 @@ func (d *DeploymentUnitPool) Create(host *host) {
 }
 
 func (d *DeploymentUnitPool) Update(host *host) {
+	logrus.Infof("Updating resource pool [%v] with deployments [%v]", d.Resource, d.Deployments)
 	host.pools[d.Resource] = d
 }
 

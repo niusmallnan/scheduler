@@ -88,7 +88,7 @@ func (v *VpcSubnetReserveAction) Reserve(scheduler *Scheduler, requests []Resour
 			return nil
 		}
 		deployments := dPool.(*DeploymentUnitPool).Deployments
-		var matchIndex int
+		matchIndex := -1
 	breakLabel:
 		for index, deployment := range deployments {
 			for _, con := range context {
@@ -99,7 +99,7 @@ func (v *VpcSubnetReserveAction) Reserve(scheduler *Scheduler, requests []Resour
 				}
 			}
 		}
-		if matchIndex > 0 {
+		if matchIndex >= 0 {
 			dPool.(*DeploymentUnitPool).Deployments = append(deployments[:matchIndex], deployments[matchIndex+1:]...)
 		}
 		logrus.Debugf("Host:%s DeploymentUnitPool: %v", host.id, scheduler.hosts[host.id].pools[tempDeploymentUnitPool])
