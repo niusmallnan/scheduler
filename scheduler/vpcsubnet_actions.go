@@ -1,6 +1,8 @@
 package scheduler
 
 import (
+	"net"
+
 	"github.com/Sirupsen/logrus"
 )
 
@@ -23,30 +25,24 @@ breakLabel:
 		if !ok {
 			continue
 		}
-		val, ok := lpool.(*LabelPool).Labels[vpcSubnetLabel]
-		if !ok || val == "" {
+		subnet, ok := lpool.(*LabelPool).Labels[vpcSubnetLabel]
+		if !ok || subnet == "" {
+			continue
+		}
+		_, ipnet, err := net.ParseCIDR(subnet)
+		if err != nil {
 			continue
 		}
 
-		tempDpool, ok := scheduler.hosts[host].pools[tempDeploymentUnitPool]
-		if !ok {
-			continue
-		}
-		curDpool, ok := scheduler.hosts[host].pools[currentDeploymentUnitPool]
-		if !ok {
-			continue
-		}
-
-		allDeployments := append(tempDpool.(*DeploymentUnitPool).Deployments, curDpool.(*DeploymentUnitPool).Deployments...)
-		logrus.Debugf("Get all deploymentUnitPool: %v from host: %s", allDeployments, host)
-
-		for _, deployment := range allDeployments {
-			for _, con := range context {
-				logrus.Debugf("Get Contxt deploymentUnitUUID: %s", con.DeploymentUnitUUID)
-				if con.DeploymentUnitUUID == deployment {
-					matchHost = host
-					break breakLabel
-				}
+		for _, con := range context {
+			logrus.Debugf("Get Contxt deploymentUnitUUID: %s", con.DeploymentUnitUUID)
+			containerIP, err := scheduler.getContainerIPByAPI(con.DeploymentUnitUUID)
+			if err != nil || containerIP == "" {
+				continue
+			}
+			if ipnet.Contains(net.ParseIP(containerIP)) {
+				matchHost = host
+				break breakLabel
 			}
 		}
 	}

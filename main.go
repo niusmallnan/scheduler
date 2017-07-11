@@ -77,6 +77,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	scheduler.SetAPIClient(apiClient)
 
 	exit := make(chan error)
 	go func(exit chan<- error) {

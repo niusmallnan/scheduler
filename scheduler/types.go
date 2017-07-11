@@ -3,6 +3,7 @@ package scheduler
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/rancher/go-rancher-metadata/metadata"
+	"github.com/rancher/go-rancher/v2"
 )
 
 type ResourceUpdater interface {
@@ -14,6 +15,7 @@ type ResourceUpdater interface {
 	UpdateWithMetadata(force bool) (bool, error)
 	GetMetadataClient() metadata.Client
 	SetMetadataClient(client metadata.Client)
+	SetAPIClient(client *client.RancherClient)
 }
 
 type ResourceRequest interface {

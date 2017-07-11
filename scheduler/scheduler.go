@@ -10,6 +10,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/rancher/go-rancher-metadata/metadata"
+	"github.com/rancher/go-rancher/v2"
 )
 
 const (
@@ -51,6 +52,7 @@ type Scheduler struct {
 	sleepTime   int
 	initialized bool
 	mdClient    metadata.Client
+	rclient     *client.RancherClient
 	knownHosts  map[string]bool
 	//lock for initialization update
 	iniMu       sync.RWMutex
@@ -342,6 +344,27 @@ func (s *Scheduler) GetMetadataClient() metadata.Client {
 
 func (s *Scheduler) SetMetadataClient(client metadata.Client) {
 	s.mdClient = client
+}
+
+func (s *Scheduler) SetAPIClient(client *client.RancherClient) {
+	s.rclient = client
+}
+
+func (s *Scheduler) getContainerIPByAPI(deploymentUnitUUID string) (string, error) {
+	listOpts := client.NewListOpts()
+	listOpts.Filters["deploymentUnitUuid"] = deploymentUnitUUID
+	collection, err := s.rclient.Container.List(listOpts)
+	if err != nil {
+		logrus.Errorf("getContainerIPByAPI: failed to request rancher-api: %v", err)
+		return "", err
+	}
+	for _, c := range collection.Data {
+		if c.PrimaryIpAddress != "" {
+			logrus.Debugf("getContainerIPByAPI: deploymentUnitUUID, %s PrimaryIpAddress, %s", deploymentUnitUUID, c.PrimaryIpAddress)
+			return c.PrimaryIpAddress, nil
+		}
+	}
+	return "", nil
 }
 
 func (s *Scheduler) reserveTempPool(hostID string, requests []ResourceRequest) {
